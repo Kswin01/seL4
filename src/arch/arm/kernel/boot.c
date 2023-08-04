@@ -140,6 +140,8 @@ BOOT_CODE static void init_irqs(cap_t root_cnode_cap)
 
 #ifdef CONFIG_ARM_ENABLE_PMU_OVERFLOW_INTERRUPT
 #ifdef KERNEL_PMU_IRQ
+    printf("IN boot.c, reserving kernel pmu irq as: %d\n", KERNEL_PMU_IRQ);
+    printf("This is the value of pmu overflow interrupt: %d\n", CONFIG_ARM_ENABLE_PMU_OVERFLOW_INTERRUPT);
     setIRQState(IRQReserved, CORE_IRQ_TO_IRQT(0, KERNEL_PMU_IRQ));
 #if (defined CONFIG_PLAT_TX1 && defined ENABLE_SMP_SUPPORT)
 //SELFOUR-1252
@@ -236,9 +238,11 @@ BOOT_CODE static bool_t init_cpu(void)
     cpu_initLocalIRQController();
 
 #ifdef CONFIG_ENABLE_BENCHMARKS
+    // printf("Config enable benchmarks was set\n");
     arm_init_ccnt();
 #endif /* CONFIG_ENABLE_BENCHMARKS */
 
+    // printf("Exporting cpu features to userland, and init timer\n");
     /* Export selected CPU features for access by PL0 */
     armv_init_user_access();
 

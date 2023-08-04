@@ -91,6 +91,13 @@ block VPPIEvent {
 }
 #endif
 
+block PMUEvent {
+    padding 768
+    field pc       64
+    padding         60
+    field seL4_FaultType 4
+}
+
 #ifdef CONFIG_HARDWARE_DEBUG_API
 block DebugException {
     padding 576

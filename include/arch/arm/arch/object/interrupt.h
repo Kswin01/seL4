@@ -20,7 +20,9 @@ static inline void handleReservedIRQ(irq_t irq)
 {
 
 #ifdef CONFIG_ARM_ENABLE_PMU_OVERFLOW_INTERRUPT
+    printf("Config set, this is the irq recieved: %lu\n", IRQT_TO_IRQ(irq));
     if (IRQT_TO_IRQ(irq) == KERNEL_PMU_IRQ) {
+        printf("We are calling handleroverflowirq\n");
         handleOverflowIRQ();
         return;
     }
