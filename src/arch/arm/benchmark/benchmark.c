@@ -50,42 +50,15 @@ void arm_init_ccnt(void)
 
 #ifdef CONFIG_ENABLE_BENCHMARKS
 void armv_handleOverflowIRQ(void) {
-    printf("This is the thread that caused the fault: %p\n", NODE_STATE(ksCurThread));
-    uint32_t value;
-
-	/* Read */
-	asm volatile("mrs %0, pmovsclr_el0" : "=r" (value));
-
-    printf("This is the value of the interrupt: %x\n", value);
-    
-    uint64_t rr = 0;
-    uint32_t r = 0;
-
-    asm volatile("isb; mrs %0, pmccntr_el0" : "=r" (rr));
-    printf("This is the current cycle counter: %llu\n", rr);
-
-    asm volatile("isb; mrs %0, pmevcntr0_el0" : "=r" (r));
-    printf("This is the current event counter 0: %d\n", r);
-    asm volatile("isb; mrs %0, pmevcntr1_el0" : "=r" (r));
-    printf("This is the current event counter 1: %d\n", r);
-    asm volatile("isb; mrs %0, pmevcntr2_el0" : "=r" (r));
-    printf("This is the current event counter 2: %d\n", r);
-    asm volatile("isb; mrs %0, pmevcntr3_el0" : "=r" (r));
-    printf("This is the current event counter 3: %d\n", r);
-    asm volatile("isb; mrs %0, pmevcntr4_el0" : "=r" (r));
-    printf("This is the current event counter 4: %d\n", r);
-    // Halt the PMU
-    asm volatile("msr pmcntenset_el0, %0" :: "r"(0 << 31));
-
-    uint64_t init_cnt = 0;
-    asm volatile("msr pmccntr_el0, %0" : : "r" (init_cnt));
-    uint64_t ip = getRegister(NODE_STATE(ksCurThread), FaultIP);
-    printf("This is the faultip: %llu\n", ip);
-    printf("This is the KERNEL PMU IRQ: %d\n", KERNEL_PMU_IRQ);
+    // Get the PC 
+    uint64_t pc = getRegister(NODE_STATE(ksCurThread), FaultIP);
+    // Save the interrupt flags
+    uint32_t irq_f = 0;
+    MRS(PMOVSR, irq_f);
     uint32_t val = BIT(CCNT_INDEX);
     MSR(PMOVSR, val);
 
-    current_fault = seL4_Fault_PMUEvent_new(ip);
+    current_fault = seL4_Fault_PMUEvent_new(pc, irq_f);
     
     assert(isRunnable(NODE_STATE(ksCurThread)));
         if (isRunnable(NODE_STATE(ksCurThread))) {

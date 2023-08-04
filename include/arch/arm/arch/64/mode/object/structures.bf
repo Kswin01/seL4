@@ -230,7 +230,7 @@ block VPPIEvent {
 
 block PMUEvent {
     field pc        64
-    padding         32
+    field irq_f     32
     padding         28
     field seL4_FaultType 4
 }

@@ -120,6 +120,9 @@ typedef enum {
 
 typedef enum {
     seL4_PMUEvent_PC,
+    seL4_PMUEvent_TIME_LOWER,
+    seL4_PMUEvent_TIME_UPPER,
+    seL4_PMUEvent_IRQ,
     SEL4_FORCE_LONG_ENUM(seL4_PMUEvent_Msg),
 } seL4_PMUEvent_Msg;
 

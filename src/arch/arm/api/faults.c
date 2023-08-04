@@ -64,6 +64,13 @@ word_t Arch_setMRs_fault(tcb_t *sender, tcb_t *receiver, word_t *receiveIPCBuffe
 
 #ifdef CONFIG_ARM_ENABLE_PMU_OVERFLOW_INTERRUPT
     case seL4_Fault_PMUEvent:
+        ticks_t ccnt = getCurrentTime();
+        // Split timestamp into two
+        uint32_t lower_ccnt = (uint32_t)(ccnt & 0xffffffff);
+        uint32_t upper_ccnt = (uint32_t)((ccnt >> 32) & 0xffffffff);
+        setMR(receiver, receiveIPCBuffer, seL4_PMUEvent_IRQ, seL4_Fault_PMUEvent_get_irq_f(sender->tcbFault));
+        setMR(receiver, receiveIPCBuffer, seL4_PMUEvent_TIME_LOWER, lower_ccnt);
+        setMR(receiver, receiveIPCBuffer, seL4_PMUEvent_TIME_UPPER, upper_ccnt);
         return setMR(receiver, receiveIPCBuffer, seL4_PMUEvent_PC, seL4_Fault_PMUEvent_get_pc(sender->tcbFault));
 #endif
     default:
