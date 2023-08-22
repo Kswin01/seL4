@@ -26,12 +26,6 @@ static void check_export_pmu(void)
     /* allow PL0 to access the PMU */
     uint32_t val = PMUSERENR_EL0_EN;
     MSR("PMUSERENR_EL0", val);
-    // MRS("PMINTENSET_EL1", val);
-    // val |= BIT(CCNT_INDEX);
-    // MSR("PMINTENSET_EL1", val);
-    // uint64_t r;
-    // asm volatile("mrs %0, PMINTENSET_EL1" : "=r" (r));
-    // printf("This is the status of the interrupt reg: %p\n", (void *)r);
 #endif
 }
 

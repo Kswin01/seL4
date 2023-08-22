@@ -133,6 +133,7 @@ void doReplyTransfer(tcb_t *sender, tcb_t *receiver, cte_t *slot, bool_t grant)
 #ifdef CONFIG_KERNEL_MCS
     if (reply->replyTCB == NULL ||
         thread_state_get_tsType(reply->replyTCB->tcbState) != ThreadState_BlockedOnReply) {
+        printf("Faulting thread not blocked on reply\n");
         /* nothing to do */
         return;
     }
@@ -187,7 +188,17 @@ void doReplyTransfer(tcb_t *sender, tcb_t *receiver, cte_t *slot, bool_t grant)
             if (validTimeoutHandler(receiver) && fault_type != seL4_Fault_Timeout) {
                 current_fault = seL4_Fault_Timeout_new(receiver->tcbSchedContext->scBadge);
                 handleTimeout(receiver);
+            // } else if (thread_state_get_tcbInReleaseQueue(receiver->tcbState) == false) {
             } else {
+                if (!isRunnable(receiver)) {
+                    printf("Receiver is not runnable\n");
+                }
+             printf("This is the prio of curthread in doReplyTransfer: %lu\n", NODE_STATE(ksCurThread)->tcbPriority);
+
+                printf("this is the state of tcbInReleaseQueue: %llu\n", thread_state_get_tcbInReleaseQueue(receiver->tcbState));
+                printf("This is the thread state: %llu\n", thread_state_get_tsType(receiver->tcbState));
+                printf("Postponing in thread.c. Insufficient refill and no timeout handler. Receiver: %lu \t Sender: %lu\n", receiver->tcbPriority, sender->tcbPriority);
+                printf("This is the thread time slice: %llu\n", receiver->tcbSchedContext->scConsumed);
                 postpone(receiver->tcbSchedContext);
             }
         }
@@ -427,6 +438,12 @@ void chooseThread(void)
         prio = getHighestPrio(dom);
         thread = NODE_STATE(ksReadyQueues)[ready_queues_index(dom, prio)].head;
         assert(thread);
+        if(thread_state_get_tcbInReleaseQueue(thread->tcbState) == true) {
+            printf("This is the prio of the annoying tcb: %lu\n", thread->tcbPriority);
+        }
+        if (isRunnable(thread) == false) {
+            printf("Thread is not runnable, prio: %lu\n", thread->tcbPriority);
+        }
         assert(isSchedulable(thread));
 #ifdef CONFIG_KERNEL_MCS
         assert(refill_sufficient(thread->tcbSchedContext, 0));

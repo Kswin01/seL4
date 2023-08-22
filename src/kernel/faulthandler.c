@@ -35,13 +35,25 @@ bool_t sendFaultIPC(tcb_t *tptr, cap_t handlerCap, bool_t can_donate)
                cap_endpoint_cap_get_capCanGrantReply(handlerCap));
 
         tptr->tcbFault = current_fault;
-        sendIPC(true, false,
+        
+        // We don't want to make PMUEvent blocking
+        if (seL4_Fault_get_seL4_FaultType(current_fault) == seL4_Fault_PMUEvent) {
+            // Not blocking, and can't grant a reply
+            sendIPC(false, false,
                 cap_endpoint_cap_get_capEPBadge(handlerCap),
                 cap_endpoint_cap_get_capCanGrant(handlerCap),
-                cap_endpoint_cap_get_capCanGrantReply(handlerCap),
+                false,
                 can_donate, tptr,
                 EP_PTR(cap_endpoint_cap_get_capEPPtr(handlerCap)));
+        } else {
+            sendIPC(true, false,
+                    cap_endpoint_cap_get_capEPBadge(handlerCap),
+                    cap_endpoint_cap_get_capCanGrant(handlerCap),
+                    cap_endpoint_cap_get_capCanGrantReply(handlerCap),
+                    can_donate, tptr,
+                    EP_PTR(cap_endpoint_cap_get_capEPPtr(handlerCap)));
 
+        }
         return true;
     } else {
         assert(cap_get_capType(handlerCap) == cap_null_cap);

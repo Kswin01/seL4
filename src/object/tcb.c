@@ -82,6 +82,10 @@ static inline void removeFromBitmap(word_t cpu, word_t dom, word_t prio)
 void tcbSchedEnqueue(tcb_t *tcb)
 {
 #ifdef CONFIG_KERNEL_MCS
+    // if(!isSchedulable(tcb)) {
+    //     printf("tcb->tcbSchedContext->scPeriod: %llu\n", tcb->tcbSchedContext->scPeriod);
+    //     printf("tcb->tcbPrio: %lu\n", tcb->tcbPriority);
+    // }
     assert(isSchedulable(tcb));
     assert(refill_sufficient(tcb->tcbSchedContext, 0));
 #endif
@@ -280,6 +284,10 @@ void tcbReleaseRemove(tcb_t *tcb)
 
 void tcbReleaseEnqueue(tcb_t *tcb)
 {
+    if(thread_state_get_tcbInReleaseQueue(tcb->tcbState) == true) {
+        printf("This is the prio of the annoying tcb: %lu\n", tcb->tcbPriority);
+        return;
+    }
     assert(thread_state_get_tcbInReleaseQueue(tcb->tcbState) == false);
     assert(thread_state_get_tcbQueued(tcb->tcbState) == false);
 

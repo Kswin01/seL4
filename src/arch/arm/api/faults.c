@@ -28,7 +28,7 @@ bool_t Arch_handleFaultReply(tcb_t *receiver, tcb_t *sender, word_t faultType)
 
 #ifdef CONFIG_ARM_ENABLE_PMU_OVERFLOW_INTERRUPT
     case seL4_Fault_PMUEvent:
-        return true;
+        return false;
 #endif
     default:
         fail("Invalid fault");

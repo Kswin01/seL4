@@ -81,7 +81,6 @@ void sendIPC(bool_t blocking, bool_t do_call, word_t badge,
         if (reply) {
             reply_unlink(reply, dest);
         }
-
         if (do_call ||
             seL4_Fault_ptr_get_seL4_FaultType(&thread->tcbFault) != seL4_Fault_NullFault) {
             if (reply != NULL && (canGrant || canGrantReply)) {
@@ -139,6 +138,7 @@ void receiveIPC(tcb_t *thread, cap_t cap, bool_t isBlocking)
     if (cap_get_capType(replyCap) == cap_reply_cap) {
         replyPtr = REPLY_PTR(cap_reply_cap_get_capReplyPtr(replyCap));
         if (unlikely(replyPtr->replyTCB != NULL && replyPtr->replyTCB != thread)) {
+            printf("Thread prio in receiveIPC: %lu\n", thread->tcbPriority);
             userError("Reply object already has unexecuted reply!");
             cancelIPC(replyPtr->replyTCB);
         }
