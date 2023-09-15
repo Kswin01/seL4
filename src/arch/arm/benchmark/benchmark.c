@@ -77,8 +77,6 @@ void armv_handleOverflowIRQ(void) {
     uint32_t val = BIT(CCNT_INDEX);
     MSR(PMOVSR, val);
 
-    printf("This is the tcb ref: %lu \t prio: %lu\n", TCB_REF(ksCurThread), ksCurThread->tcbPriority);
-
     // Unwinding the call stack, currently only supporting 4 prev calls (arbitrary size)
     /* NOTES
         The target programs will require compiling with the arm "-fno-omit-frame-pointer" option.
@@ -98,8 +96,6 @@ void armv_handleOverflowIRQ(void) {
 
     current_fault = seL4_Fault_PMUEvent_new(pc, irq_f);
     
-    assert(isRunnable(NODE_STATE(ksCurThread)));
-
     if (isRunnable(NODE_STATE(ksCurThread))) {
         handleFault(NODE_STATE(ksCurThread));
         schedule();
