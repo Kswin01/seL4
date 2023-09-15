@@ -368,6 +368,19 @@ void schedule(void)
             scheduleChooseNewThread();
         } else {
             tcb_t *candidate = NODE_STATE(ksSchedulerAction);
+            if (isSchedulable(candidate) == false) {
+                printf("Not scheduable in thread.c. Thread prio: %lu\n", candidate->tcbPriority);
+            }
+
+            if(thread_state_get_tcbInReleaseQueue(candidate->tcbState) == true) {
+                printf("not schedulable because of release queue\n");
+            } else if (candidate->tcbSchedContext == NULL) {
+                printf("no sched context\n");
+            } else if (candidate->tcbSchedContext->scRefillMax <= 0) {
+                printf("no refill left\n");
+            } else if (!isRunnable(candidate)) {
+                printf("This is thread state: %llu\n", thread_state_get_tsType(candidate->tcbState));
+            }
             assert(isSchedulable(candidate));
             /* Avoid checking bitmap when ksCurThread is higher prio, to
              * match fast path.

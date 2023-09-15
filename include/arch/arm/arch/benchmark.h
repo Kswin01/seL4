@@ -32,8 +32,25 @@ static inline timestamp_t timestamp(void)
 }
 
 #ifdef CONFIG_ARM_ENABLE_PMU_OVERFLOW_INTERRUPT
-static inline void handleOverflowIRQ(void)
+static inline void handleOverflowIRQ(irq_t irq)
 {
+// #ifdef CONFIG_KERNEL_MCS
+//     /* If the current task is currently enqueued it will not be able to
+//      * correctly receive a fault IPC message. This may occur due to the
+//      * budget check that happens early in the handleInterruptEntry.
+//      *
+//      * If the current thread does *not* have budget this interrupt is
+//      * ignored for now. As it is a level-triggered interrupt it shall
+//      * be re-raised (and not lost).
+//      */
+//     if (thread_state_get_tcbQueued(NODE_STATE(ksCurThread)->tcbState)) {
+//         printf("Ignoring irq in handleOverflowIRQ\n");
+//         return;
+//     }
+
+//     maskInterrupt(false, irq);
+
+// #endif
     if (likely(NODE_STATE(benchmark_log_utilisation_enabled))) {
         NODE_STATE(ksCurThread)->benchmark.utilisation += UINT32_MAX - NODE_STATE(ksCurThread)->benchmark.schedule_start_time;
         NODE_STATE(ksCurThread)->benchmark.schedule_start_time = 0;

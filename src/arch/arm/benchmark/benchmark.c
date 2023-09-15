@@ -51,28 +51,23 @@ void arm_init_ccnt(void)
 #ifdef CONFIG_ENABLE_BENCHMARKS
 void armv_handleOverflowIRQ(void) {
     // Halt the PMU
-    // SYSTEM_WRITE_WORD(PMCNTENSET, (0 << 31));
-    // uint64_t val2 = 0;
-    // asm volatile("MRS %0, pmcr_el0" : "=r" (val2));
-    // val2 &= 0x3f;
-    // asm volatile("isb" : : : "memory");
-    // asm volatile("MSR pmcr_el0, %0" : : "r" (val2));
-    uint32_t value = 0;
+
+    // uint32_t value = 0;
     uint32_t mask = 0;
 
     /* Disable Performance Counter */
-    asm volatile("MRS %0, PMCR_EL0" : "=r" (value));
+    // MRS("PMCR_EL0", value);
     mask = 0;
     mask |= (1 << 0); /* Enable */
     mask |= (1 << 1); /* Cycle counter reset */
     mask |= (1 << 2); /* Reset all counters */
-    asm volatile("MSR PMCR_EL0, %0" : : "r" (value & ~mask));
+    MSR("PMCR_EL0", (~mask));
 
     /* Disable cycle counter register */
-    asm volatile("MRS %0, PMCNTENSET_EL0" : "=r" (value));
+    // MRS("PMCNTENSET_EL0", value);
     mask = 0;
     mask |= (1 << 31);
-    asm volatile("MSR PMCNTENSET_EL0, %0" : : "r" (value & ~mask));
+    MSR("PMCNTENSET_EL0", (~mask));
 
     // Get the PC 
     uint64_t pc = getRegister(NODE_STATE(ksCurThread), FaultIP);
@@ -81,6 +76,8 @@ void armv_handleOverflowIRQ(void) {
     MRS(PMOVSR, irq_f);
     uint32_t val = BIT(CCNT_INDEX);
     MSR(PMOVSR, val);
+
+    printf("This is the tcb ref: %lu \t prio: %lu\n", TCB_REF(ksCurThread), ksCurThread->tcbPriority);
 
     // Unwinding the call stack, currently only supporting 4 prev calls (arbitrary size)
     /* NOTES
@@ -104,7 +101,9 @@ void armv_handleOverflowIRQ(void) {
     assert(isRunnable(NODE_STATE(ksCurThread)));
 
     if (isRunnable(NODE_STATE(ksCurThread))) {
-    handleFault(NODE_STATE(ksCurThread));
+        handleFault(NODE_STATE(ksCurThread));
+        schedule();
+        activateThread();
     }
 
 }

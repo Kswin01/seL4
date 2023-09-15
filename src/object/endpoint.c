@@ -85,6 +85,7 @@ void sendIPC(bool_t blocking, bool_t do_call, word_t badge,
         if (do_call ||
             seL4_Fault_ptr_get_seL4_FaultType(&thread->tcbFault) != seL4_Fault_NullFault) {
             if (reply != NULL && (canGrant || canGrantReply)) {
+                // printf("Calling reply_push in sendIPC\n");
                 reply_push(thread, dest, reply, canDonate);
             } else {
                 setThreadState(thread, ThreadState_Inactive);
@@ -248,13 +249,16 @@ void receiveIPC(tcb_t *thread, cap_t cap, bool_t isBlocking)
                 if ((canGrant || canGrantReply) && replyPtr != NULL) {
                     bool_t canDonate = sender->tcbSchedContext != NULL
                                        && seL4_Fault_get_seL4_FaultType(sender->tcbFault) != seL4_Fault_Timeout;
+                    // printf("Calling reply_push from recvIPC\n");
                     reply_push(sender, thread, replyPtr, canDonate);
                 } else {
                     setThreadState(sender, ThreadState_Inactive);
                 }
             } else {
                 setThreadState(sender, ThreadState_Running);
+                printf("receive ipc sender %lu\n", sender->tcbPriority);
                 possibleSwitchTo(sender);
+                printf("after\n");
                 assert(sender->tcbSchedContext == NULL || refill_sufficient(sender->tcbSchedContext, 0));
             }
 #else

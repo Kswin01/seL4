@@ -287,6 +287,7 @@ void schedContext_resume(sched_context_t *sc)
     if (likely(sc) && isSchedulable(sc->scTcb)) {
         if (!(refill_ready(sc) && refill_sufficient(sc, 0))) {
             assert(!thread_state_get_tcbQueued(sc->scTcb->tcbState));
+            printf("calling postpone from schedContext_resume\n");
             postpone(sc);
         }
     }
