@@ -79,19 +79,6 @@ void armv_handleOverflowIRQ(void) {
     MSR(PMOVSR, val);
 
     // Unwinding the call stack, currently only supporting 4 prev calls (arbitrary size)
-    /* NOTES        
-        
-        The frame pointer is saved in register x29.
-        
-        Will need a way to detect if frame pointers have been saved??
-        */
-
-    // Arch_userStackTrace(ksCurThread);
-
-    // word_t fp = getRegister(NODE_STATE(ksCurThread), X29);
-    // printf("This is the frame pointer: %lx\n", fp);
-
-    // CALL STACK UNWINDING
 
     // First, get the threadRoot capability based on the current tcb
     cap_t threadRoot = TCB_PTR_CTE_PTR(NODE_STATE(ksCurThread), tcbVTable)->cap;
@@ -127,14 +114,12 @@ void armv_handleOverflowIRQ(void) {
             if (fp == 0) {
                 break;
             } 
-
         } else {
             // If we are unable to read, then we have reached the end of our stack unwinding
             printf("0x%"SEL4_PRIx_word": INVALID\n",
                    lr_addr);
             break;
-        }
-        
+        }        
     } 
 
     current_fault = seL4_Fault_PMUEvent_new(pc, irq_f);
@@ -157,7 +142,6 @@ void armv_handleOverflowIRQ(void) {
         schedule();
         activateThread();
     }
-
 }
 
 #endif
