@@ -8,6 +8,8 @@
 #include <arch/benchmark.h>
 #include <armv/benchmark.h>
 #include <api/faults.h>
+#include <arch/arm/arch/64/mode/kernel/vspace.h>
+
 #if CONFIG_MAX_NUM_TRACE_POINTS > 0
 timestamp_t ksEntries[CONFIG_MAX_NUM_TRACE_POINTS];
 bool_t ksStarted[CONFIG_MAX_NUM_TRACE_POINTS];
@@ -52,7 +54,6 @@ void arm_init_ccnt(void)
 void armv_handleOverflowIRQ(void) {
     // Halt the PMU
 
-    // uint32_t value = 0;
     uint32_t mask = 0;
 
     /* Disable Performance Counter */
@@ -78,11 +79,7 @@ void armv_handleOverflowIRQ(void) {
     MSR(PMOVSR, val);
 
     // Unwinding the call stack, currently only supporting 4 prev calls (arbitrary size)
-    /* NOTES
-        The target programs will require compiling with the arm "-fno-omit-frame-pointer" option.
-        
-        This forces the compiler to add in frame pointers on every function call, and is required
-        for stack unwinding. 
+    /* NOTES        
         
         The frame pointer is saved in register x29.
         
@@ -93,6 +90,50 @@ void armv_handleOverflowIRQ(void) {
 
     // word_t fp = getRegister(NODE_STATE(ksCurThread), X29);
     // printf("This is the frame pointer: %lx\n", fp);
+
+    // CALL STACK UNWINDING
+
+    // First, get the threadRoot capability based on the current tcb
+    cap_t threadRoot = TCB_PTR_CTE_PTR(NODE_STATE(ksCurThread), tcbVTable)->cap;
+
+    /* lookup the vspace root */
+    if (cap_get_capType(threadRoot) != cap_vtable_root_cap) {
+        printf("Invalid vspace\n");
+        return;
+    }
+
+    vspace_root_t *vspaceRoot = cap_vtable_root_get_basePtr(threadRoot);
+
+    // Read the x29 register for the address of the current frame pointer
+    word_t fp = getRegister(NODE_STATE(ksCurThread), X29);
+
+    // Loop and read the start of the frame pointer, save the lr value and load the next fp
+    for (int i = 0; i < 4; i++) {
+        // The LR should be above the FP
+        word_t lr_addr = fp + sizeof(word_t);
+
+        // We need to traverse the list. We want to save the value of the LR in the frame
+        // entry, and then look at the next frame record. 
+        readWordFromVSpace_ret_t read_lr = readWordFromVSpace(vspaceRoot, lr_addr);
+        readWordFromVSpace_ret_t read_fp = readWordFromVSpace(vspaceRoot, fp);
+        if (read_fp.status == EXCEPTION_NONE && read_lr.status == EXCEPTION_NONE) {
+            // Set the fp value to the next frame entry
+            fp = read_fp.value;
+
+            // If the fp is 0, then we have reached the end of the frame stack chain
+            if (fp == 0) {
+                break;
+            }
+
+
+        } else {
+            // If we are unable to read, then we have reached the end of our stack unwinding
+            printf("0x%"SEL4_PRIx_word": INVALID\n",
+                   lr_addr);
+            break;
+        }
+        
+    } 
 
     current_fault = seL4_Fault_PMUEvent_new(pc, irq_f);
     
