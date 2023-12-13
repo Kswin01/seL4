@@ -118,6 +118,18 @@ typedef enum {
 
 #endif /* CONFIG_ARM_HYPERVISOR_SUPPORT */
 
+typedef enum {
+    seL4_PMUEvent_PC,
+    seL4_PMUEvent_TIME_LOWER,
+    seL4_PMUEvent_TIME_UPPER,
+    seL4_PMUEvent_IRQ,
+    seL4_PMUEvent_CC0,
+    seL4_PMUEvent_CC1,
+    seL4_PMUEvent_CC2,
+    seL4_PMUEvent_CC3,
+    SEL4_FORCE_LONG_ENUM(seL4_PMUEvent_Msg),
+} seL4_PMUEvent_Msg;
+
 #ifdef CONFIG_KERNEL_MCS
 typedef enum {
     seL4_TimeoutReply_FaultIP,

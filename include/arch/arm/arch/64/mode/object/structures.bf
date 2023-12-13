@@ -210,6 +210,13 @@ block VPPIEvent {
 }
 #endif
 
+block PMUEvent {
+    field pc        64
+    field irq_f     32
+    padding         28
+    field seL4_FaultType 4
+}
+
 -- VM attributes
 
 block vm_attributes {
