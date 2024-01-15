@@ -118,6 +118,7 @@ typedef enum {
 
 #endif /* CONFIG_ARM_HYPERVISOR_SUPPORT */
 
+#ifdef CONFIG_PROFILER_ENABLE
 typedef enum {
     seL4_PMUEvent_PC,
     seL4_PMUEvent_TIME_LOWER,
@@ -129,6 +130,7 @@ typedef enum {
     seL4_PMUEvent_CC3,
     SEL4_FORCE_LONG_ENUM(seL4_PMUEvent_Msg),
 } seL4_PMUEvent_Msg;
+#endif
 
 #ifdef CONFIG_KERNEL_MCS
 typedef enum {
