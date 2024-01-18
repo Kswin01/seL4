@@ -7,6 +7,7 @@
 
 #ifdef CONFIG_PROFILER_ENABLE
 void armv_handleOverflowIRQ(void) {
+
     // Halt the PMU
     uint32_t mask = 0;
 
@@ -22,6 +23,11 @@ void armv_handleOverflowIRQ(void) {
     mask |= (1 << 31);
     MSR("PMCNTENSET_EL0", (~mask));
 
+    if (NODE_STATE(ksCurThread) == NULL) {
+        printf("NULL current thread\n");
+        return;
+    }
+
     // Get the PC 
     uint64_t pc = getRegister(NODE_STATE(ksCurThread), FaultIP);
     // Save the interrupt flags
@@ -30,11 +36,30 @@ void armv_handleOverflowIRQ(void) {
     uint32_t val = BIT(CCNT_INDEX);
     MSR(PMOVSR, val);
 
+    // Hardcoding skipping the idle thread
+    if (NODE_STATE(ksCurThread)->tcbPriority == 0) {
+        uint64_t init_cnt = 0xffffffffffffffff - 1200000;
+        asm volatile("msr pmccntr_el0, %0" : : "r" (init_cnt));
+        uint64_t val;
+
+        asm volatile("mrs %0, pmcr_el0" : "=r" (val));
+
+        val |= BIT(0);
+
+        asm volatile("isb; msr pmcr_el0, %0" : : "r" (val));
+
+        asm volatile("MSR PMCNTENSET_EL0, %0" : : "r" (BIT(31)));
+        return;
+    }   
+
+
     // Unwinding the call stack, currently only supporting 4 prev calls (arbitrary size)
 
     // First, get the threadRoot capability based on the current tcb
     cap_t threadRoot = TCB_PTR_CTE_PTR(NODE_STATE(ksCurThread), tcbVTable)->cap;
 
+    // printf("current thread prio: %ld\n", NODE_STATE(ksCurThread)->tcbPriority);
+    // debug_printTCB(NODE_STATE(ksCurThread));
     /* lookup the vspace root */
     if (cap_get_capType(threadRoot) != cap_vspace_cap) {
         printf("Invalid vspace\n");
