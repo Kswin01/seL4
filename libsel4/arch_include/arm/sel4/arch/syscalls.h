@@ -690,20 +690,6 @@ LIBSEL4_INLINE_FUNC seL4_Word seL4_BenchmarkFinalizeLog(void)
     return (seL4_Word) index_ret;
 }
 
-LIBSEL4_INLINE_FUNC seL4_Error seL4_BenchmarkSetLogBuffer(seL4_Word frame_vaddr)
-{
-    seL4_Word unused0 = 0;
-    seL4_Word unused1 = 0;
-    seL4_Word unused2 = 0;
-    seL4_Word unused3 = 0;
-    seL4_Word unused4 = 0;
-
-    arm_sys_send_recv(seL4_SysBenchmarkSetLogBuffer, frame_vaddr, &frame_vaddr, 0, &unused0, &unused1, &unused2, &unused3,
-                      &unused4, 0);
-
-    return (seL4_Error) frame_vaddr;
-}
-
 LIBSEL4_INLINE_FUNC void seL4_BenchmarkNullSyscall(void)
 {
     arm_sys_null(seL4_SysBenchmarkNullSyscall);
@@ -795,6 +781,22 @@ LIBSEL4_INLINE_FUNC seL4_Error seL4_ProfilerRegisterThread(seL4_Word thread_id)
 
 }
 #endif /* CONFIG_PROFILER_ENABLE */
+
+#if defined(CONFIG_PROFILER_ENABLE) || defined(CONFIG_ENABLE_BENCHMARK)
+LIBSEL4_INLINE_FUNC seL4_Error seL4_BenchmarkSetLogBuffer(seL4_Word frame_vaddr)
+{
+    seL4_Word unused0 = 0;
+    seL4_Word unused1 = 0;
+    seL4_Word unused2 = 0;
+    seL4_Word unused3 = 0;
+    seL4_Word unused4 = 0;
+
+    arm_sys_send_recv(seL4_SysBenchmarkSetLogBuffer, frame_vaddr, &frame_vaddr, 0, &unused0, &unused1, &unused2, &unused3,
+                      &unused4, 0);
+
+    return (seL4_Error) frame_vaddr;
+}
+#endif
 
 #ifdef CONFIG_SET_TLS_BASE_SELF
 LIBSEL4_INLINE_FUNC void seL4_SetTLSBase(seL4_Word tls_base)

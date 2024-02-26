@@ -7,7 +7,8 @@
 #pragma once
 
 #include <config.h>
-#ifdef CONFIG_ENABLE_BENCHMARKS
+
+#if defined(CONFIG_ENABLE_BENCHMARKS) || defined(CONFIG_PROFILER_ENABLE)
 
 #define CCNT "PMCCNTR_EL0"
 #define PMCR "PMCR_EL0"

@@ -408,7 +408,6 @@ config_option(
 config_option(
     ProfilerEnable PROFILER_ENABLE
     "Enable support for the seL4 Profiling framework."
-    DEPENDS "KernelBenchmarks"
     DEFAULT OFF
 )
 

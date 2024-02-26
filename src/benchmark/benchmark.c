@@ -76,21 +76,6 @@ exception_t handle_SysBenchmarkFinalizeLog(void)
     return EXCEPTION_NONE;
 }
 
-#ifdef CONFIG_KERNEL_LOG_BUFFER
-exception_t handle_SysBenchmarkSetLogBuffer(void)
-{
-    word_t frame_vaddr = getRegister(NODE_STATE(ksCurThread), capRegister);
-    
-    if (benchmark_arch_map_logBuffer(frame_vaddr) != EXCEPTION_NONE) {
-        printf("Exception raised\n");
-        setRegister(NODE_STATE(ksCurThread), capRegister, seL4_IllegalOperation);
-        return EXCEPTION_SYSCALL_ERROR;
-    }
-    setRegister(NODE_STATE(ksCurThread), capRegister, seL4_NoError);
-    return EXCEPTION_NONE;
-}
-#endif /* CONFIG_KERNEL_LOG_BUFFER */
-
 #ifdef CONFIG_BENCHMARK_TRACK_UTILISATION
 
 exception_t handle_SysBenchmarkGetThreadUtilisation(void)
@@ -169,3 +154,18 @@ exception_t handle_SysProfilerRegisterThread(void) {
     return EXCEPTION_NONE;
 }
 #endif
+
+#if (defined(CONFIG_ENABLE_BENCHMARKS) || defined(CONFIG_PROFILER_ENABLE)) && defined(CONFIG_KERNEL_LOG_BUFFER)
+exception_t handle_SysBenchmarkSetLogBuffer(void)
+{
+    word_t frame_vaddr = getRegister(NODE_STATE(ksCurThread), capRegister);
+    
+    if (benchmark_arch_map_logBuffer(frame_vaddr) != EXCEPTION_NONE) {
+        printf("Exception raised\n");
+        setRegister(NODE_STATE(ksCurThread), capRegister, seL4_IllegalOperation);
+        return EXCEPTION_SYSCALL_ERROR;
+    }
+    setRegister(NODE_STATE(ksCurThread), capRegister, seL4_NoError);
+    return EXCEPTION_NONE;
+}
+#endif /* CONFIG_KERNEL_LOG_BUFFER */

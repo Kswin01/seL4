@@ -6,7 +6,6 @@
 #include <sel4/config.h>
 #include <sel4/profiler_types.h>
 
-#ifdef CONFIG_ENABLE_BENCHMARKS
 #ifdef CONFIG_PROFILER_ENABLE
 void armv_handleOverflowIRQ(void) {
     // Halt the PMU
@@ -110,5 +109,4 @@ void armv_handleOverflowIRQ(void) {
      #endif
  
 }
-#endif
 #endif

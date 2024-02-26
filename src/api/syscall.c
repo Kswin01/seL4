@@ -173,18 +173,19 @@ exception_t handleUnknownSyscall(word_t w)
     }
 #endif
 
-#ifdef CONFIG_ENABLE_BENCHMARKS
+#if (defined(CONFIG_ENABLE_BENCHMARKS) || defined(CONFIG_PROFILER_ENABLE))
     switch (w) {
+#ifdef CONFIG_KERNEL_LOG_BUFFER
+    case SysBenchmarkSetLogBuffer:
+        return handle_SysBenchmarkSetLogBuffer();
+#endif
+#ifdef CONFIG_ENABLE_BENCHMARKS
     case SysBenchmarkFlushCaches:
         return handle_SysBenchmarkFlushCaches();
     case SysBenchmarkResetLog:
         return handle_SysBenchmarkResetLog();
     case SysBenchmarkFinalizeLog:
         return handle_SysBenchmarkFinalizeLog();
-#ifdef CONFIG_KERNEL_LOG_BUFFER
-    case SysBenchmarkSetLogBuffer:
-        return handle_SysBenchmarkSetLogBuffer();
-#endif /* CONFIG_KERNEL_LOG_BUFFER */
 #ifdef CONFIG_BENCHMARK_TRACK_UTILISATION
     case SysBenchmarkGetThreadUtilisation:
         return handle_SysBenchmarkGetThreadUtilisation();
@@ -201,8 +202,9 @@ exception_t handleUnknownSyscall(word_t w)
         return EXCEPTION_NONE;
     default:
         break; /* syscall is not for benchmarking */
+#endif/* CONFIG_ENABLE_BENCHMARKS */
     } /* end switch(w) */
-#endif /* CONFIG_ENABLE_BENCHMARKS */
+#endif 
 
 #ifdef CONFIG_PROFILER_ENABLE
     if (w == SysProfilerRegisterThread) {

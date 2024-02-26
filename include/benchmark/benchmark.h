@@ -18,9 +18,6 @@
 exception_t handle_SysBenchmarkFlushCaches(void);
 exception_t handle_SysBenchmarkResetLog(void);
 exception_t handle_SysBenchmarkFinalizeLog(void);
-#ifdef CONFIG_KERNEL_LOG_BUFFER
-exception_t handle_SysBenchmarkSetLogBuffer(void);
-#endif /* CONFIG_KERNEL_LOG_BUFFER */
 #ifdef CONFIG_BENCHMARK_TRACK_UTILISATION
 exception_t handle_SysBenchmarkGetThreadUtilisation(void);
 exception_t handle_SysBenchmarkResetThreadUtilisation(void);
@@ -34,6 +31,10 @@ exception_t handle_SysBenchmarkResetAllThreadsUtilisation(void);
 #ifdef CONFIG_PROFILER_ENABLE
 exception_t handle_SysProfilerRegisterThread(void);
 #endif
+
+#if (defined(CONFIG_ENABLE_BENCHMARKS) || defined(CONFIG_PROFILER_ENABLE)) && defined(CONFIG_KERNEL_LOG_BUFFER)
+exception_t handle_SysBenchmarkSetLogBuffer(void);
+#endif /* CONFIG_KERNEL_LOG_BUFFER */
 
 #if CONFIG_MAX_NUM_TRACE_POINTS > 0
 #define TRACE_POINT_START(x) trace_point_start(x)

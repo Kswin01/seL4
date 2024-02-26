@@ -67,13 +67,16 @@
             <syscall name="BenchmarkFlushCaches" />
             <syscall name="BenchmarkResetLog" />
             <syscall name="BenchmarkFinalizeLog"  />
-            <syscall name="BenchmarkSetLogBuffer"  />
             <syscall name="BenchmarkNullSyscall"  />
         </config>
         <config>
             <condition><config var="CONFIG_BENCHMARK_TRACK_UTILISATION"/></condition>
             <syscall name="BenchmarkGetThreadUtilisation"  />
             <syscall name="BenchmarkResetThreadUtilisation"  />
+        </config>
+        <config>
+            <condition><config var="CONFIG_KERNEL_LOG_BUFFER"/></condition>
+            <syscall name="BenchmarkSetLogBuffer"  />
         </config>
         <config>
             <condition><config var="CONFIG_PROFILER_ENABLE" /></condition>
