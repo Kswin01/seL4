@@ -31,7 +31,7 @@ exception_t handle_SysBenchmarkFlushCaches(void)
 
 exception_t handle_SysBenchmarkResetLog(void)
 {
-#ifdef CONFIG_BENCHMARK_TRACK_KERNEL_ENTRIES   
+#ifdef CONFIG_BENCHMARK_TRACK_KERNEL_ENTRIES
 #ifdef CONFIG_KERNEL_LOG_BUFFER
     if (ksUserLogBuffer == 0) {
         userError("A user-level buffer has to be set before resetting benchmark.\
@@ -80,7 +80,7 @@ exception_t handle_SysBenchmarkFinalizeLog(void)
 exception_t handle_SysBenchmarkSetLogBuffer(void)
 {
     word_t frame_vaddr = getRegister(NODE_STATE(ksCurThread), capRegister);
-    
+
     if (benchmark_arch_map_logBuffer(frame_vaddr) != EXCEPTION_NONE) {
         printf("Exception raised\n");
         setRegister(NODE_STATE(ksCurThread), capRegister, seL4_IllegalOperation);

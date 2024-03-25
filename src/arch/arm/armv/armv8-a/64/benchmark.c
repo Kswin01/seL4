@@ -14,7 +14,7 @@ void armv_handleOverflowIRQ(void) {
 
     // Disable counters
     mask = 0;
-    mask |= (1 << 0); 
+    mask |= (1 << 0);
     mask |= (1 << 1);
     mask |= (1 << 2);
     MSR("PMCR_EL0", (~mask));
@@ -28,7 +28,7 @@ void armv_handleOverflowIRQ(void) {
         printf("NULL current thread\n");
         return;
     }
-    
+
     #ifdef CONFIG_KERNEL_LOG_BUFFER
 
       // Checking the log buffer exists, and is valid
@@ -37,7 +37,7 @@ void armv_handleOverflowIRQ(void) {
                 Use seL4_BenchmarkSetLogBuffer\n");
         setRegister(NODE_STATE(ksCurThread), capRegister, seL4_IllegalOperation);
         return;
-    } 
+    }
 
     // Get the pmu sample structure in the log
     pmu_sample_t *profLogs = (pmu_sample_t *) KS_LOG_PPTR;
@@ -48,7 +48,7 @@ void armv_handleOverflowIRQ(void) {
         return;
     }
 
-    // Get the PC 
+    // Get the PC
     uint64_t pc = getRegister(NODE_STATE(ksCurThread), FaultIP);
 
 
@@ -68,7 +68,7 @@ void armv_handleOverflowIRQ(void) {
         word_t lr_addr = fp + sizeof(word_t);
 
         // We need to traverse the frame stack chain. We want to save the value of the LR in the frame
-        // entry as part of our perf callchain, and then look at the next frame record. 
+        // entry as part of our perf callchain, and then look at the next frame record.
         readWordFromVSpace_ret_t read_lr = readWordFromVSpace(vspaceRoot, lr_addr);
         readWordFromVSpace_ret_t read_fp = readWordFromVSpace(vspaceRoot, fp);
         if (read_fp.status == EXCEPTION_NONE && read_lr.status == EXCEPTION_NONE) {
@@ -85,7 +85,7 @@ void armv_handleOverflowIRQ(void) {
             printf("0x%"SEL4_PRIx_word": INVALID\n",
                    lr_addr);
             break;
-        }        
+        }
     }
     // Add the data to the profiler log buffer
     profLogs[0].valid = 1;
@@ -101,7 +101,7 @@ void armv_handleOverflowIRQ(void) {
     // The period is only known by the profiler.
     profLogs[0].period = 0;
      #endif
- 
+
 }
 #endif
 #endif

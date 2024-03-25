@@ -1866,7 +1866,7 @@ void Arch_userStackTrace(tcb_t *tptr)
 exception_t benchmark_arch_map_logBuffer(word_t frame_vaddr)
 {
     lookupPTSlot_ret_t lu_ret;
-    
+
     cap_t threadRoot = TCB_PTR_CTE_PTR(NODE_STATE(ksCurThread), tcbVTable)->cap;
     vspace_root_t *vspaceRoot = VSPACE_PTR(cap_vspace_cap_get_capVSBasePtr(threadRoot));
     lu_ret = lookupPTSlot(vspaceRoot, frame_vaddr);
