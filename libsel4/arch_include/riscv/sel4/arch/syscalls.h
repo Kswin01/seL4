@@ -990,7 +990,7 @@ LIBSEL4_INLINE_FUNC seL4_Error seL4_ProfilerRegisterThread(seL4_Word thread_id)
     seL4_Word unused4 = 0;
 
     riscv_sys_send_recv(seL4_SysProfilerRegisterThread, thread_id, &thread_id, 0, &unused0, &unused1, &unused2, &unused3,
-                      &unused4, 0);
+                        &unused4, 0);
 
     return (seL4_Error) thread_id;
 

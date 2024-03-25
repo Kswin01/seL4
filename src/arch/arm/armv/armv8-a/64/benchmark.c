@@ -8,7 +8,8 @@
 
 #ifdef CONFIG_ENABLE_BENCHMARKS
 #ifdef CONFIG_PROFILER_ENABLE
-void armv_handleOverflowIRQ(void) {
+void armv_handleOverflowIRQ(void)
+{
     // Halt the PMU
     uint32_t mask = 0;
 
@@ -29,7 +30,7 @@ void armv_handleOverflowIRQ(void) {
         return;
     }
 
-    #ifdef CONFIG_KERNEL_LOG_BUFFER
+#ifdef CONFIG_KERNEL_LOG_BUFFER
 
       // Checking the log buffer exists, and is valid
     if (ksUserLogBuffer == 0) {
@@ -93,15 +94,15 @@ void armv_handleOverflowIRQ(void) {
     // Populate PID with whatever we registered inside the TCB
     profLogs[0].pid = NODE_STATE(ksCurThread)->tcbProfileId;
     profLogs[0].time = getCurrentTime();
-    #ifdef ENABLE_SMP_SUPPORT
+#ifdef ENABLE_SMP_SUPPORT
     profLogs[0].cpu = NODE_STATE(ksCurThread)->tcbAffinity;
-    #else
+#else
     profLogs[0].cpu = 0;
-    #endif
+#endif
     // The period is only known by the profiler.
     profLogs[0].period = 0;
-     #endif
-
+#endif
+    return;
 }
 #endif
 #endif
