@@ -1886,7 +1886,7 @@ exception_t benchmark_arch_map_logBuffer(word_t frame_vaddr)
 
     ksUserLogBuffer = pte_page_ptr_get_page_base_address(lu_ret.ptSlot);
 
-    *armKSGlobalLogPDE = pte_pte_page_new(
+    *armKSGlobalLogPTE = pte_pte_page_new(
 #ifdef CONFIG_ARM_HYPERVISOR_SUPPORT
                              0, // XN
 #else
@@ -1899,7 +1899,7 @@ exception_t benchmark_arch_map_logBuffer(word_t frame_vaddr)
                              0,                         /* VMKernelOnly */
                              NORMAL_WT);
 
-    cleanByVA_PoU((vptr_t)armKSGlobalLogPDE, addrFromKPPtr(armKSGlobalLogPDE));
+    cleanByVA_PoU((vptr_t)armKSGlobalLogPTE, addrFromKPPtr(armKSGlobalLogPTE));
     invalidateTranslationSingle(KS_LOG_PPTR);
     return EXCEPTION_NONE;
 }

@@ -5,10 +5,11 @@
 #include <arch/arm/arch/64/mode/kernel/vspace.h>
 #include <sel4/config.h>
 #include <sel4/profiler_types.h>
+#include <arch/model/smp.h>
 
 #ifdef CONFIG_ENABLE_BENCHMARKS
 #ifdef CONFIG_PROFILER_ENABLE
-void armv_handleOverflowIRQ(void)
+void armv_handleOverflowIRQ()
 {
     // Halt the PMU
     uint32_t mask = 0;
@@ -30,6 +31,7 @@ void armv_handleOverflowIRQ(void)
         return;
     }
 
+
 #ifdef CONFIG_KERNEL_LOG_BUFFER
 
       // Checking the log buffer exists, and is valid
@@ -40,12 +42,27 @@ void armv_handleOverflowIRQ(void)
         return;
     }
 
-    // Get the pmu sample structure in the log
+    // Get the pmu sample structure in the log of the CPU that currently overflowed.
+    // TODO: Add memory bound checks here. KS log buffer is 2MiB, make sure that
+    // (sizeof(pmu_sample_t) * NUM_CPU_NODES) <= 2MiB
     pmu_sample_t *profLogs = (pmu_sample_t *) KS_LOG_PPTR;
-
+// #ifdef ENABLE_SMP_SUPPORT
+//     // printf("This is the CPU affinity of the running thread: %ld\n", NODE_STATE(ksCurThread)->tcbAffinity);
+//     if (NODE_STATE(ksCurThread->tcbAffinity) == 0) {
+//         profLogs[getCurrentCPUIndex()].valid = 0;
+//         return;
+//     }
+// #endif
     // Check that this TCB has been marked to track
     if (NODE_STATE(ksCurThread)->tcbProfileId == 0) {
+            printf("This is the invalid thread: %lx\n", NODE_STATE(ksCurThread)->tcbPriority);
+#ifdef ENABLE_SMP_SUPPORT
+        printf("This is the current cpu index: %ld\n", getCurrentCPUIndex());
+
+        profLogs[getCurrentCPUIndex()].valid = 0;
+#else
         profLogs[0].valid = 0;
+#endif
         return;
     }
 
@@ -75,8 +92,13 @@ void armv_handleOverflowIRQ(void)
         if (read_fp.status == EXCEPTION_NONE && read_lr.status == EXCEPTION_NONE) {
             // Set the fp value to the next frame entry
             fp = read_fp.value;
+#ifdef ENABLE_SMP_SUPPORT
+            profLogs[getCurrentCPUIndex()].ips[i] = read_lr.value;
+            profLogs[getCurrentCPUIndex()].nr = i;
+#else
             profLogs[0].ips[i] = read_lr.value;
             profLogs[0].nr = i;
+#endif
             // If the fp is 0, then we have reached the end of the frame stack chain
             if (fp == 0) {
                 break;
@@ -88,19 +110,27 @@ void armv_handleOverflowIRQ(void)
             break;
         }
     }
+#ifdef ENABLE_SMP_SUPPORT
+    // Add the data to the profiler log buffer
+    profLogs[getCurrentCPUIndex()].valid = 1;
+    profLogs[getCurrentCPUIndex()].ip = pc;
+    // Populate PID with whatever we registered inside the TCB
+    profLogs[getCurrentCPUIndex()].pid = NODE_STATE(ksCurThread)->tcbProfileId;
+    profLogs[getCurrentCPUIndex()].time = getCurrentTime();
+    profLogs[getCurrentCPUIndex()].cpu = NODE_STATE(ksCurThread)->tcbAffinity;
+    // The period is only known by the profiler.
+    profLogs[getCurrentCPUIndex()].period = 0;
+#else
     // Add the data to the profiler log buffer
     profLogs[0].valid = 1;
     profLogs[0].ip = pc;
     // Populate PID with whatever we registered inside the TCB
     profLogs[0].pid = NODE_STATE(ksCurThread)->tcbProfileId;
     profLogs[0].time = getCurrentTime();
-#ifdef ENABLE_SMP_SUPPORT
-    profLogs[0].cpu = NODE_STATE(ksCurThread)->tcbAffinity;
-#else
     profLogs[0].cpu = 0;
-#endif
     // The period is only known by the profiler.
     profLogs[0].period = 0;
+#endif
 #endif
     return;
 }
