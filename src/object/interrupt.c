@@ -143,6 +143,7 @@ void invokeIRQHandler_AckIRQ(irq_t irq)
 #endif
     /* @ivanv: This is from Yanyan's RISC-V HE changes I think, need
        to check this. */
+    maskInterrupt(false, irq);
     return;
 #endif
 
@@ -152,7 +153,6 @@ void invokeIRQHandler_AckIRQ(irq_t irq)
         return;
     }
 #endif
-    maskInterrupt(false, irq);
 }
 
 void invokeIRQHandler_SetIRQHandler(irq_t irq, cap_t cap, cte_t *slot)
@@ -219,9 +219,9 @@ void handleInterrupt(irq_t irq)
             printf("Undelivered IRQ: %d\n", (int)IRQT_TO_IRQ(irq));
 #endif
         }
-#ifndef CONFIG_ARCH_RISCV
+// #ifndef CONFIG_ARCH_RISCV
         maskInterrupt(true, irq);
-#endif
+// #endif
         break;
     }
 
