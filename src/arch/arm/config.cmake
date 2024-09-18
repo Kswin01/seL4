@@ -35,8 +35,8 @@ elseif(KernelArmCortexA72)
 elseif(KernelArmCortexA78AE)
     # Even though CortexA78AE supports 48-bits
     # 44 bits PA is used
-    set(KernelArmPASizeBits44 ON)
-    math(EXPR KernelPaddrUserTop "(1 << 44)")
+    set(KernelArmPASizeBits40 ON)
+    math(EXPR KernelPaddrUserTop "(1 << 40)")
 endif()
 config_set(KernelArmPASizeBits40 ARM_PA_SIZE_BITS_40 "${KernelArmPASizeBits40}")
 config_set(KernelArmPASizeBits44 ARM_PA_SIZE_BITS_44 "${KernelArmPASizeBits44}")
