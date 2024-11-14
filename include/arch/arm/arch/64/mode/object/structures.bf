@@ -136,8 +136,7 @@ block smc_cap {
 #endif
 
 block pmu_control_cap {
-    padding             64
-
+    field capPMUBadge   64
     field capType       5
     padding             59
 }
@@ -179,6 +178,7 @@ tagged_union cap capType {
 #ifdef CONFIG_ALLOW_SMC_CALLS
     tag smc_cap                     25
 #endif
+    tag pmu_control_cap                     27
 }
 
 ---- Arch-independent object types

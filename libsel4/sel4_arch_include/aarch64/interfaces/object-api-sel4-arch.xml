@@ -233,4 +233,99 @@
                 description="The structure to capture the responses."/>
         </method>
     </interface>
+
+        <interface name="seL4_ARM_PMUControl">
+        <method id="PMUReadEventCounter" name="ReadEventCounter" manual_name="ReadEventCounter" manual_label="pmucontrol_readeventcounter">
+            <brief>
+                Read the PMU counter associated with the specified input paramater.
+            </brief>
+            <description>
+                See <autoref label="sec:threads"/>
+            </description>
+            <return><errorenumdesc/></return>
+            <param dir="in" name="counter" type="seL4_Word"
+                description="Hardware counter number you wish to read from."/>
+            <param dir="out" name="counter_value" type="seL4_Word"
+                description="Value read from the hardware counter." />
+            <error name="seL4_IllegalOperation">
+                <description>
+                    The <texttt text="_service"/> is a CPtr to a capability of the wrong type.
+                </description>
+            </error>
+            <error name="seL4_RangeError">
+                <description>
+                    The <texttt text="counter"/> less than 0, or greater than the number of hardware counters
+                    present.
+                </description>
+            </error>
+        </method>
+
+        <method id="PMUWriteEventCounter" name="WriteEventCounter" manual_name="WriteEventCounter" manual_label="pmucontrol_writeeventcounter">
+            <brief>
+                Write the PMU counter value and event type associated with the specified input paramater.
+            </brief>
+            <description>
+                See <autoref label="sec:threads"/>
+            </description>
+            <return><errorenumdesc/></return>
+            <param dir="in" name="counter" type="seL4_Word"
+                description="Hardware counter number you wish to write to."/>
+            <param dir="in" name="counter_value" type="seL4_Word"
+                description="Value you wish to set the hardware counter to."/>
+            <param dir="in" name="event_type" type="seL4_Word"
+                description="The micro-architectural event that you wish to count."/>
+            <error name="seL4_IllegalOperation">
+                <description>
+                    The <texttt text="_service"/> is a CPtr to a capability of the wrong type.
+                </description>
+            </error>
+            <error name="seL4_RangeError">
+                <description>
+                    The <texttt text="counter"/> less than 0, or greater than the number of hardware counters
+                    present.
+                </description>
+            </error>
+        </method>
+
+        <method id="PMUCounterControl" name="CounterControl" manual_name="CounterControl" manual_label="pmucontrol_countercontrol">
+            <brief>
+                Start, stop or reset the PMU.
+            </brief>
+            <description>
+                See <autoref label="sec:threads"/>
+            </description>
+            <return><errorenumdesc/></return>
+            <param dir="in" name="control" type="seL4_Word"
+                description="This is the action we wish to control. 0 - stop, 1 - start, 2 - reset"/>
+            <error name="seL4_IllegalOperation">
+                <description>
+                    The <texttt text="_service"/> is a CPtr to a capability of the wrong type.
+                </description>
+            </error>
+            <error name="seL4_RangeError">
+                <description>
+                    The <texttt text="counter"/> less than 0, or greater than the number of hardware counters
+                    present.
+                </description>
+            </error>
+        </method>
+
+        <method id="PMUInterruptValue" name="InterruptValue" manual_name="InterruptValue" manual_label="pmucontrol_interruptvalue">
+            <brief>
+                Get the interrupt value of the PMU.
+            </brief>
+            <description>
+                See <autoref label="sec:threads"/>
+            </description>
+            <return><errorenumdesc/></return>
+            <param dir="out" name="interrupt_val" type="seL4_Word"
+                description="This is the return value of the interrupt value."/>
+            <error name="seL4_IllegalOperation">
+                <description>
+                    The <texttt text="_service"/> is a CPtr to a capability of the wrong type.
+                </description>
+            </error>
+        </method>
+    </interface>
+
 </api>

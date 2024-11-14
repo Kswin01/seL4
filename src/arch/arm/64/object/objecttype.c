@@ -104,6 +104,13 @@ deriveCap_ret_t Arch_deriveCap(cte_t *slot, cap_t cap)
 
 cap_t CONST Arch_updateCapData(bool_t preserve, word_t data, cap_t cap)
 {
+    if (cap_get_capType(cap) == cap_pmu_control_cap) {
+        if (!preserve && cap_pmu_control_cap_get_capPMUBadge(cap) == 0) {
+            return cap_pmu_control_cap_set_capPMUBadge(cap, data);
+        } else {
+            return cap_null_cap_new();
+        }
+    }
 #ifdef CONFIG_ALLOW_SMC_CALLS
     if (cap_get_capType(cap) == cap_smc_cap) {
         if (!preserve && cap_smc_cap_get_capSMCBadge(cap) == 0) {
@@ -494,6 +501,8 @@ exception_t Arch_decodeInvocation(word_t label, word_t length, cptr_t cptr,
     case cap_smc_cap:
         return decodeARMSMCInvocation(label, length, cptr, slot, cap, call, buffer);
 #endif
+    case cap_pmu_control_cap:
+        return decodePMUControlInvocation(label, length, cptr, slot, cap, call, buffer);
     default:
 #else
 {
