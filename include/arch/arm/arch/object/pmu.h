@@ -191,22 +191,15 @@ enum pmu_register_el0 {
 #define CYCLE_CTR 6
 
 /* PMU Register Names */
-#define PMU_EVENT_CTR0 "pmevcntr0_el0"
-#define PMU_EVENT_TYP0 "pmevtyper0_el0"
-#define PMU_EVENT_CTR1 "pmevcntr1_el0"
-#define PMU_EVENT_TYP1 "pmevtyper1_el0"
-#define PMU_EVENT_CTR2 "pmevcntr2_el0"
-#define PMU_EVENT_TYP2 "pmevtyper2_el0"
-#define PMU_EVENT_CTR3 "pmevcntr3_el0"
-#define PMU_EVENT_TYP3 "pmevtyper3_el0"
-#define PMU_EVENT_CTR4 "pmevcntr4_el0"
-#define PMU_EVENT_TYP4 "pmevtyper4_el0"
-#define PMU_EVENT_CTR5 "pmevcntr5_el0"
-#define PMU_EVENT_TYP5 "pmevtyper5_el0"
 #define PMU_CYCLE_CTR "pmccntr_el0"
 #define PMCR_EL0 "pmcr_el0"
 #define PMCNTENSET_EL0 "pmcntenset_el0"
 #define PMOVSCLR_EL0 "pmovsclr_el0"
+#define PMINTENSET_EL1 "pmintenset_el1"
+/* Event select register */
+#define PMSELR_EL0 "pmselr_el0"
+#define PMXEVCNTR_EL0 "pmxevcntr_el0"
+#define PMXEVTYPER_EL0 "pmxevtyper_el0"
 
 exception_t decodePMUControlInvocation(word_t label, unsigned int length, cptr_t cptr,
                                          cte_t *srcSlot, cap_t cap,
