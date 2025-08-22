@@ -16,7 +16,7 @@ typedef seL4_CPtr seL4_RISCV_Page;
 typedef seL4_CPtr seL4_RISCV_PageTable;
 typedef seL4_CPtr seL4_RISCV_ASIDControl;
 typedef seL4_CPtr seL4_RISCV_ASIDPool;
-
+typedef seL4_CPtr seL4_RISCV_PMUControl;
 
 #define seL4_EndpointBits     4
 /* User context as used by seL4_TCB_ReadRegisters / seL4_TCB_WriteRegisters */

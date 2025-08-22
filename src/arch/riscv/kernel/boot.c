@@ -123,6 +123,11 @@ BOOT_CODE static void init_fpu(void)
 }
 #endif
 
+BOOT_CODE static void init_pmu_control(cap_t root_cnode_cap)
+{
+    write_slot(SLOT_PTR(pptr_of_cap(root_cnode_cap), seL4_CapPMUControl), cap_pmu_control_cap_new(0));
+}
+
 BOOT_CODE static void init_cpu(void)
 {
 
@@ -307,6 +312,8 @@ static BOOT_CODE bool_t try_init_kernel(
 
     /* initialise the IRQ states and provide the IRQ control cap */
     init_irqs(root_cnode_cap);
+
+    init_pmu_control(root_cnode_cap);
 
     /* create the bootinfo frame */
     populate_bi_frame(0, CONFIG_MAX_NUM_NODES, ipcbuf_vptr, extra_bi_size);
